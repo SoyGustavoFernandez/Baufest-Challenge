@@ -1,0 +1,94 @@
+﻿# 🧠 Ejercicios Técnicos .NET
+
+Este repositorio contiene la solución a tres ejercicios técnicos diseñados de la empresa **Baufest** para evaluar habilidades en desarrollo back-end con C#, .NET Core, AutoMapper, diseño de APIs REST y lógica de negocio.
+
+---
+
+## 📦 PRIMER EJERCICIO: AutoMapper Configuración para eShop
+
+### 🧩 Contexto
+
+Trabajas como desarrollador back-end en un servicio **eShop**, colaborando con un colega front-end para implementar un componente de pedidos.
+
+### 🎯 Tareas
+
+Configurar **AutoMapper** para mapear de modelos de base de datos a DTOs simplificados para la UI.
+
+### 🔁 Requisitos de Mapping
+
+#### OrderDto:
+
+- `Id`: ❌ Ignorar (no mapear)
+- `CustomerName`: ✔️ `Order.CustomerDetails.Name`
+- `OrderDateFormatted`: ✔️ `Order.OrderDate.ToString("yyyy-MM-dd")` (ISO 8601)
+- `OrderedProducts`: ✔️ Mapeo desde `Order.Products` a `IEnumerable<ProductDto>`
+- `TenantInformation`: ✔️ Mapeo especial vía `ITenantResolver`
+
+#### ProductDto:
+
+- `Name`: ✔️ `Order.Products.Name`
+- `Status`: ✔️ `"Available"` si `IsAvailable`, `"Not available"` si no.
+- `Price`: ✔️ Formato como `"$29.99"` (solo si `IsAvailable`)
+- `CategoryList`: ✔️ Lista separada por comas de `Order.Product.Categories`
+
+#### TenantInformation (mapeo especial):
+
+- Origen: cache, no viene de DB.
+- Resolver: `ITenantResolver.Resolve(int id)`  
+- ID origen: `Order.CustomerDetails.TenantId`
+- Campos: `Name`, `Address`, `Country` → `TenantDto`
+
+---
+
+### 📚 Modelos y DTOs
+
+#### Modelos (en `model/`):
+
+```csharp
+public class Order {
+    public int Id { get; set; }
+    public Customer CustomerDetails { get; set; } // Puede ser null
+    public IEnumerable<Product> Products { get; set; }
+    public DateTime OrderDate { get; set; }
+}
+
+public class Product {
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+    public bool IsAvailable { get; set; }
+    public IEnumerable<Category> Categories { get; set; }
+}
+
+public class OrderDto {
+    public string CustomerName { get; set; }
+    public string OrderDateFormatted { get; set; }
+    public IEnumerable<ProductDto> OrderedProducts { get; set; }
+    public TenantDto TenantInformation { get; set; }
+}
+
+public class ProductDto {
+    public string Name { get; set; }
+    public string Status { get; set; }
+    public string Price { get; set; }
+    public string CategoryList { get; set; }
+}
+
+⚙️ Restricciones Técnicas
+Lenguaje: C# 8.0 con .NET Core 3.1
+
+Order.CustomerDetails puede ser null
+
+Otros submodelos no son null
+
+TenantId siempre es válido
+
+ITenantResolver.Resolve(id) nunca retorna null
+
+🗂 Estructura del Proyecto
+dto/
+
+model/
+
+interface/
+
+start.cs (configuración inicial)
