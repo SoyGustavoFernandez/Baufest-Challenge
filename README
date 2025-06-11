@@ -1,6 +1,7 @@
-﻿# 🧠 Ejercicios Técnicos .NET
 
-Este repositorio contiene la solución a tres ejercicios técnicos diseñados de la empresa **Baufest** para evaluar habilidades en desarrollo back-end con C#, .NET Core, AutoMapper, diseño de APIs REST y lógica de negocio.
+# 🧠 Ejercicios Técnicos .NET
+
+Este repositorio contiene la solución a tres ejercicios técnicos diseñados para evaluar habilidades en desarrollo back-end con C#, .NET Core, AutoMapper, diseño de APIs REST y lógica de negocio.
 
 ---
 
@@ -27,14 +28,14 @@ Configurar **AutoMapper** para mapear de modelos de base de datos a DTOs simplif
 #### ProductDto:
 
 - `Name`: ✔️ `Order.Products.Name`
-- `Status`: ✔️ `"Available"` si `IsAvailable`, `"Not available"` si no.
+- `Status`: ✔️ `"Available"` si `IsAvailable`, `"Not available"` si no
 - `Price`: ✔️ Formato como `"$29.99"` (solo si `IsAvailable`)
 - `CategoryList`: ✔️ Lista separada por comas de `Order.Product.Categories`
 
-#### TenantInformation (mapeo especial):
+#### TenantInformation (Mapeo Especial):
 
-- Origen: cache, no viene de DB.
-- Resolver: `ITenantResolver.Resolve(int id)`  
+- Origen: cache, no viene de DB
+- Resolver: `ITenantResolver.Resolve(int id)`
 - ID origen: `Order.CustomerDetails.TenantId`
 - Campos: `Name`, `Address`, `Country` → `TenantDto`
 
@@ -42,7 +43,7 @@ Configurar **AutoMapper** para mapear de modelos de base de datos a DTOs simplif
 
 ### 📚 Modelos y DTOs
 
-#### Modelos (en `model/`):
+#### Modelos (`model/`):
 
 ```csharp
 public class Order {
@@ -58,7 +59,11 @@ public class Product {
     public bool IsAvailable { get; set; }
     public IEnumerable<Category> Categories { get; set; }
 }
+```
 
+#### DTOs (`dto/`):
+
+```csharp
 public class OrderDto {
     public string CustomerName { get; set; }
     public string OrderDateFormatted { get; set; }
@@ -72,23 +77,99 @@ public class ProductDto {
     public string Price { get; set; }
     public string CategoryList { get; set; }
 }
+```
 
-⚙️ Restricciones Técnicas
-Lenguaje: C# 8.0 con .NET Core 3.1
+---
 
-Order.CustomerDetails puede ser null
+### ⚙️ Restricciones Técnicas
 
-Otros submodelos no son null
+- Lenguaje: C# 8.0 con .NET Core 3.1
+- `Order.CustomerDetails` puede ser null
+- Otros submodelos no son null
+- `TenantId` siempre es válido
+- `ITenantResolver.Resolve(id)` nunca retorna null
 
-TenantId siempre es válido
+### 🗂 Estructura del Proyecto
 
-ITenantResolver.Resolve(id) nunca retorna null
+- `dto/`
+- `model/`
+- `interface/`
+- `start.cs` (configuración inicial)
 
-🗂 Estructura del Proyecto
-dto/
+---
 
-model/
+## 🍕 SEGUNDO EJERCICIO: Costo Mínimo de Pedido de Pizza
 
-interface/
+### 🎯 Objetivo
 
-start.cs (configuración inicial)
+Calcular el costo mínimo total de una orden de pizzas aplicando **como máximo uno** de los siguientes 4 descuentos, o sin aplicar ninguno.
+
+---
+
+### 🧱 Estructuras:
+
+```csharp
+public record Pizza(string name, int price_S, int price_M, int price_L);
+public record OrderItem(string name, string size, int quantity);
+```
+
+### 🧠 Firma de la función:
+
+```csharp
+class Solution {
+    public int solution(Pizza[] menu, OrderItem[] order) {
+        // Tu lógica aquí
+    }
+}
+```
+
+---
+
+### 💸 Descuentos
+
+1. **Sin Descuento**  
+2. **Descuento 1: "Compra 3, la más barata es gratis"**  
+3. **Descuento 2: "Compra 5 del mismo tipo por 100"**  
+4. **Descuento 3: "Por cada Large, una Small gratis"**  
+5. **Descuento 4: "Compra 3 Large, paga como Medium"**  
+
+---
+
+## 🏬 TERCER EJERCICIO: API REST para Almacén
+
+### 🧰 Requerimiento
+
+Crear una API REST para controlar el stock de un almacén. Se deben permitir las siguientes operaciones:
+
+### 🔧 Operaciones
+
+- `GetProducts()`
+- `SetProductCapacity(productId, capacity)`
+- `ReceiveProduct(productId, quantity)`
+- `DispatchProduct(productId, quantity)`
+
+### 📏 Reglas de Negocio
+
+- ❗ Las cantidades deben ser mayores a 0.
+- ❌ No se puede definir una capacidad menor al stock actual.
+- ❌ No se puede recibir si supera la capacidad máxima.
+- ❌ No se puede despachar si no hay suficiente stock.
+
+### 💬 Mensajes de Error
+
+- `"NotPositiveQuantityMessage"`
+- `"QuantityTooLowMessage"`
+- `"QuantityTooHighMessage"`
+
+### 🧱 Estructura Recomendada
+
+```csharp
+public class Product {
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int Capacity { get; set; }
+    public int Quantity { get; set; }
+}
+```
+
+---
